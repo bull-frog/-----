@@ -10,8 +10,6 @@
 		<script>
 var originalText;
 
-
-
 function convert() {
 	originalText = document.getElementById('originalText').value;
 	let array = originalText.split("\n");
@@ -19,9 +17,9 @@ function convert() {
 	for (let i = 0; i < array.length; i++) {
 		let line = array[i];
 		result += readLine(line);
-		result += "\n";
+		// result += "";
 	}
-	document.getElementById('result').textContent = result;
+	document.getElementById('result').innerHTML = result;
 }
 
 const kanji = /^[\u4E00-\u9FFF\u3005-\u3007]+$/;
@@ -31,7 +29,7 @@ function isDifficult(c) {
 
 function readLine(line) {
 	let beforeText;
-	let afterText = ' "/>';
+	let afterText = '';
 
 	if (line.startsWith('# ')) {
 		beforeText = "<h1>";
@@ -66,7 +64,7 @@ function readLine(line) {
 		afterText += "</p>";
 	}
 
-	let result = beforeText + '<T v="';
+	let result = beforeText;
 	
 	let difficultText = "";
 	let rubyFlag = false;
@@ -76,11 +74,11 @@ function readLine(line) {
 		let c = line.charAt(i);
 
 		if (c == '[') {
-			result += "[" + difficultText + "](";
+			result += "<ruby><rb>" + difficultText + "</rb><rp>(</rp><rt>";
 			difficultText = "";
 			rubyFlag = true;
 		} else if (c == ']') {
-			result += ")";
+			result += "</rt><rp>)</rp></ruby>";
 			rubyFlag = false;
 		} else if (rubyFlag) {
 			result += c;

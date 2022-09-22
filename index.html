@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			textarea {
+				width: 98vw;
+				height: 50vh;
+			}
+		</style>
+		<script>
+var originalText;
+
+
+
+function convert() {
+	originalText = document.getElementById('originalText').value;
+	let array = originalText.split("\n");
+	let result = "";
+	for (let i = 0; i < array.length; i++) {
+		let line = array[i];
+		result += readLine(line) + "\n";
+	}
+	document.getElementById('result').textContent = result;
+}
+
+const kanji = /^[\u4E00-\u9FFF\u3005-\u3007]+$/;
+function isDifficult(c) {
+	return kanji.test(c);
+}
+
+function readLine(line) {
+	let beforeText;
+	let afterText = ' "/>';
+
+	if (line.startsWith('# ')) {
+		beforeText = "<h1>";
+		afterText += "</h1>";
+		line = line.substring(2);
+	} else if (line.startsWith('## ')) {
+		beforeText = "<h2>";
+		afterText += "</h2>";
+		line = line.substring(3);
+	} else if (line.startsWith('### ')) {
+		beforeText = "<h3>";
+		afterText += "</h3>";
+		line = line.substring(4);
+	} else if (line.startsWith('#### ')) {
+		beforeText = "<h4>";
+		afterText += "</h4>";
+		line = line.substring(5);
+	} else if (line.startsWith('##### ')) {
+		beforeText = "<h5>";
+		afterText += "</h5>";
+		line = line.substring(6);
+	} else if (line.startsWith('###### ')) {
+		beforeText = "<h6>";
+		afterText += "</h6>";
+		line = line.substring(7);
+	} else if (line.startsWith('* ')) {
+		beforeText = "<ul><li>";
+		afterText += "</li></ul>";
+		line = line.substring(2);
+	} else {
+		beforeText = "<p>";
+		afterText += "</p>";
+	}
+
+	let result = beforeText + '<T v="';
+	
+	let difficultText = "";
+	let rubyFlag = false;
+
+	for (let i = 0; i < line.length; i++) {
+
+		let c = line.charAt(i);
+
+		if (c == '[') {
+			result += "[" + difficultText + "](";
+			difficultText = "";
+			rubyFlag = true;
+		} else if (c == ']') {
+			result += ")";
+			rubyFlag = false;
+		} else if (rubyFlag) {
+			result += c;
+		} else {
+			if (!isDifficult(c)) {
+				if (difficultText != "") {
+					result += difficultText;
+					difficultText = "";
+				}
+				result += c;
+			} else {
+				difficultText += c;
+			}
+		}
+
+	}
+
+	if (difficultText != "") {
+		result += difficultText;
+	}
+
+	result += afterText;
+	return result;
+
+}
+		</script>
+	</head>
+	<body>
+		<textarea id="originalText" placeholder="MD記法で記入。漢字[ふりがな]"></textarea>
+		<button id="button" onclick="convert();">解釈！</button>
+		<div id="result"></div>
+	</body>
+</html>
